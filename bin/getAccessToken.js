@@ -36,9 +36,6 @@ module.exports = async (settings) => {
 	if (!integration.payload) {
 		throw Error('settings file does not have an "integration.payload" property.');
 	}
-	if (!integration.privateKey) {
-		throw Error('settings file does not have an "integration.privateKey" property.');
-	}
 	if (!environment) {
 		throw Error('settings file does not have an "environment" property.');
 	}
@@ -48,12 +45,13 @@ module.exports = async (settings) => {
 
 	let privateKeyContent;
 
-	// check the privateKey exists
+	/* check the privateKey DEPRECATED
 	if (fs.existsSync(integration.privateKey)) {
 		privateKeyContent = fs.readFileSync(integration.privateKey);
 	} else {
 		throw Error("Private Key file does not exist at that location.");
 	}
+	*/
 
 	// Honestly have no idea what to do here. Launch requires an OAuth2 Client Credentials grant.
 	// Tried using passportjs but it was not intuitive.
