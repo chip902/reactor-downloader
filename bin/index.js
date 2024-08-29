@@ -290,7 +290,6 @@ yargs
 				])
 			).propertyId;
 		}
-
 		await download(args);
 
 		if (args.save) {

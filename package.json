@@ -25,7 +25,8 @@
 		"reactor-downloader": "./bin/index.js"
 	},
 	"scripts": {
-		"eslint": "./node_modules/.bin/eslint ."
+		"eslint": "./node_modules/.bin/eslint .",
+		"reactor-downloader": "node ./bin/index.js"
 	},
 	"dependencies": {
 		"@adobe/reactor-downloader": "^0.2.1",
