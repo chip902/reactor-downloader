@@ -59,7 +59,7 @@ yargs
 		},
 		save: {
 			type: "boolean",
-			describe: "Whether to save the authentication and other settings in a file for further use in other tools.",
+			describe: "Whether to save the authentication and other settings to a custom path (settings are always saved to ./.reactor-settings.json by default).",
 		},
 		"settings-path": {
 			type: "string",
@@ -82,7 +82,6 @@ yargs
 				args.orgId = args.integration && args.integration.payload && args.integration.payload.iss;
 				args.techAccountId = args.integration && args.integration.payload && args.integration.payload.sub;
 				args.apiKey = args.integration && args.integration.clientId;
-				args.clientSecret = args.integration && args.integration.clientSecret;
 				args.clientSecret = args.integration && args.integration.clientSecret;
 			} catch (e) {
 				throw Error("Settings file is not parsable as a JSON object.");
@@ -131,12 +130,12 @@ yargs
 		// accessToken information
 		/* DEPRECATED JWT TOKEN METHOD
   if (!args.privateKey) {
-    args.privateKey = (await inquirer.prompt([{
-      type: 'input',
-      name: 'privateKey',
-      message: 'What is the path (relative or absolute) to your private key?',
-      validate: Boolean
-    }])).privateKey;
+	args.privateKey = (await inquirer.prompt([{
+	  type: 'input',
+	  name: 'privateKey',
+	  message: 'What is the path (relative or absolute) to your private key?',
+	  validate: Boolean
+	}])).privateKey;
   }
 */
 		if (!args.orgId) {
@@ -292,20 +291,26 @@ yargs
 		}
 		await download(args);
 
-		if (args.save) {
-			// settings object
-			const settings = {
-				propertyId: args.propertyId,
-				environment: args.environment,
-				integration: {
-					clientId: args.integration.clientId,
-					clientSecret: args.integration.clientSecret,
-					privateKey: args.integration.privateKey,
-					payload: args.integration.payload,
-				},
-			};
+		// Always save settings file for reactor-sync compatibility
+		// This ensures reactor-sync can function properly
+		const settings = {
+			propertyId: args.propertyId,
+			environment: args.environment,
+			integration: {
+				clientId: args.integration.clientId,
+				clientSecret: args.integration.clientSecret,
+				privateKey: args.integration.privateKey,
+				payload: args.integration.payload,
+			},
+		};
 
-			fs.writeFileSync(settingsPath, JSON.stringify(settings, null, "  "));
+		fs.writeFileSync(settingsPath, JSON.stringify(settings, null, "  "));
+		console.log(`Settings saved to ${settingsPath}`);
+
+		// Provide additional save option for custom path if user specified --save
+		if (args.save && args.settingsPath && args.settingsPath !== './.reactor-settings.json') {
+			fs.writeFileSync(args.settingsPath, JSON.stringify(settings, null, "  "));
+			console.log(`Settings also saved to ${args.settingsPath}`);
 		}
 	})
 	// TODO: finish this when ready and public
